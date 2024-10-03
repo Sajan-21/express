@@ -1,0 +1,26 @@
+body {
+    background-color: black;
+    color: white;
+}
+
+nav {
+    border: 2px solid white;
+    padding: 20px;
+}
+
+nav a {
+    text-decoration: none;
+    border: 2px solid white ;
+    background-color: white;
+    color: black;
+    padding: 8px;
+}
+
+form {
+    border: 2px solid black;
+}
+
+.name-section,.email-section,.password-section {
+    margin: 8px;
+    color: red;
+}
