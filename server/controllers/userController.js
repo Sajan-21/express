@@ -7,7 +7,6 @@ const fileUpload = require('../utils/file-upload').fileUpload;
 
 exports.createUser = async function (req, res) {
     try {
-
         let body = req.body;
         console.log("body : ", body);
 
@@ -24,9 +23,7 @@ exports.createUser = async function (req, res) {
         console.log("password : ", password);
 
         let image = req.body.image;
-        // console.log("image : ", image);
 
-        //validations required
         if (!name) {
 
             let response = error_function({
@@ -38,15 +35,12 @@ exports.createUser = async function (req, res) {
             return;
         }
 
-
         if(image) {
           let img_path =  await fileUpload(image,"users");
           console.log("img_path : ", img_path);
           body.image = img_path;
         }
 
-
-        //Password Hashing
         let salt = bcrypt.genSaltSync(10);
         console.log("salt : ", salt);
 
