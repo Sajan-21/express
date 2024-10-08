@@ -3,7 +3,11 @@ const users = require('../db/models/users');
 const success_function = require('../utils/response-handler').success_function;
 const error_function = require('../utils/response-handler').error_function;
 const bcrypt = require('bcryptjs');
+const { sendEmail } = require('../utils/send-email');
 const fileUpload = require('../utils/file-upload').fileUpload;
+const email_template = require('../utils/email-templates/setPassword').resetPassword;
+const dotenv = require('dotenv');
+dotenv.config();
 
 exports.createUser = async function (req, res) {
     try {
@@ -19,8 +23,21 @@ exports.createUser = async function (req, res) {
         let age = req.body.age;
         console.log("age : ", age);
 
-        let password = req.body.password;
-        console.log("password : ", password);
+        function generateRandomPassword(length) {
+            let charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$";
+            let password = "";
+            
+            for(var i = 0; i < length; i++) {
+                var randomIndex = Math.floor(Math.random()*charset.length);
+                password += charset.charAt(randomIndex);
+            }
+            return password;
+        }
+
+        var randomPassword = generateRandomPassword(12);
+        console.log("random password : ",randomPassword);
+
+        await sendEmail(email, "password created", email_template);
 
         let image = req.body.image;
 
@@ -44,7 +61,7 @@ exports.createUser = async function (req, res) {
         let salt = bcrypt.genSaltSync(10);
         console.log("salt : ", salt);
 
-        let hashed_password = bcrypt.hashSync(password, salt);
+        let hashed_password = bcrypt.hashSync(randomPassword, salt);
         console.log("hashed_password : ", hashed_password);
 
         let count = await users.countDocuments({ email });
