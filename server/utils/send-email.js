@@ -1,9 +1,13 @@
 "use strict";
 const nodemailer = require("nodemailer");
+const dotenv = require("dotenv");
+dotenv.config();
 
 exports.sendEmail = async function(emails, subject, content) {
     return new Promise(async (resolve, reject) => {
         try {
+            console.log("email sendEmail : ",emails);
+            console.log("content : ",content);
             if(typeof emails == "object") emails = emails.join(", ");
 
             let transporter = nodemailer.createTransport({
@@ -15,12 +19,14 @@ exports.sendEmail = async function(emails, subject, content) {
                     pass : process.env.EMAIL_PASSWORD,
                 },
             });
+            console.log("transporter : ",transporter);
             let info = await transporter.sendMail({
-                form : '"pomograd" <support@pomograd.ru>',
+                from : '"pomograd" <support@pomograd.ru>',
                 to : emails,
                 subject : subject,
                 html : content,
             });
+            // console.log("info : ",info);
             resolve(true);
         } catch (error) {
             reject(false);

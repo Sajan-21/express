@@ -1,4 +1,4 @@
-exports.resetPassword = function (name, email, password) {
+exports.setPassword = function (name, email, password) {
     return new Promise(async (resolve, reject) => {
       try {
         let template = `
@@ -159,7 +159,7 @@ exports.resetPassword = function (name, email, password) {
         resolve(template);
       }
       catch (error) {
-        //console.log(error);
+        console.log(error);
         reject(error);
       }
     })

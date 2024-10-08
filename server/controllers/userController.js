@@ -3,9 +3,9 @@ const users = require('../db/models/users');
 const success_function = require('../utils/response-handler').success_function;
 const error_function = require('../utils/response-handler').error_function;
 const bcrypt = require('bcryptjs');
-const { sendEmail } = require('../utils/send-email');
+const sendEmail = require('../utils/send-email').sendEmail;
 const fileUpload = require('../utils/file-upload').fileUpload;
-const email_template = require('../utils/email-templates/setPassword').resetPassword;
+const email_Template = require('../utils/email-templates/setPassword').setPassword;
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -14,14 +14,11 @@ exports.createUser = async function (req, res) {
         let body = req.body;
         console.log("body : ", body);
 
-        let name = req.body.name;
+        let name = body.name;
         console.log("name : ", name);
 
-        let email = req.body.email;
+        let email = body.email;
         console.log("email : ", email);
-
-        let age = req.body.age;
-        console.log("age : ", age);
 
         function generateRandomPassword(length) {
             let charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$";
@@ -37,9 +34,10 @@ exports.createUser = async function (req, res) {
         var randomPassword = generateRandomPassword(12);
         console.log("random password : ",randomPassword);
 
+        let email_template = await email_Template(name, email, randomPassword);
         await sendEmail(email, "password created", email_template);
 
-        let image = req.body.image;
+        
 
         if (!name) {
 
@@ -52,7 +50,9 @@ exports.createUser = async function (req, res) {
             return;
         }
 
-        if(image) {
+        if(body.image) {
+
+          let image = body.image;
           let img_path =  await fileUpload(image,"users");
           console.log("img_path : ", img_path);
           body.image = img_path;
@@ -77,11 +77,16 @@ exports.createUser = async function (req, res) {
             return
         }
 
-        body.password = hashed_password;
-        console.log("body : ", body);
+        let user_type = await user_types.findOne({user_type : body.user_type});
+        user_type = user_type._id;
 
-        let user_type = await user_types.findOne({user_type : req.body.user_type});
-        body.user_type = user_type._id;
+        body = {
+            name,
+            email,
+            password : hashed_password,
+            user_type,
+        }
+        console.log("newbody : ",body)
         
         let new_user = await users.create(body);
 
